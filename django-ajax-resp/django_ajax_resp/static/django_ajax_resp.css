@@ -1,0 +1,36 @@
+
+#loading {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.5);
+	filter: alpha(opacity=50, style=0);
+    -moz-opacity: 50%; 
+	margin: auto;
+    z-index: 15000;
+}
+
+#loading #loading_alert img{
+    vertical-align:middle;
+	display:block;
+	margin: 8px;
+}
+
+#loading_alert{
+	position:relative;
+	margin: auto;
+    display:block;
+	background-color: rgba(255, 255, 255, 0.8);
+    filter: alpha(opacity=80, style=0);
+    -moz-opacity: 80%; 
+    border-bottom: #ABABAB 1px solid;
+    border-right: #ABABAB 1px solid;
+	width: 53px;
+	height: 60px;
+	z-index: 20000;
+	padding: 10px;
+}
+
