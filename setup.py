@@ -40,7 +40,7 @@ def get_package_data(package):
     return {package: filepaths}
 
 
-version = get_version('djangorestframework')
+version = get_version('django_ajax_resp')
 
 
 if sys.argv[-1] == 'publish':
