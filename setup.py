@@ -63,7 +63,7 @@ setup(
     packages=get_packages('django_ajax_resp'),
     package_data=get_package_data('django_ajax_resp'),
     test_suite='',
-    install_requires=['URLObject>=0.6.0'],
+    install_requires=[],
     extras_require={
     },
     classifiers=[
