@@ -1,0 +1,2 @@
+Django==1.4
+git+git://github.com/matteofattore-nextage/django-ajax-resp.git#egg=django_ajax_resp

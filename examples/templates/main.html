@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load i18n%}
+{% block head %}
+		<link rel='stylesheet' type='text/css' href='{{STATIC_URL}}django_ajax_resp.css' />
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  {% endblock %}
+
+{% block content %}
+
+<!-- L attributo "django-ajax-resp-method" è facoltativo, in valore di default è "GET" -->	
+<div id="content" django-ajax-resp-url="{% url loadtestform %}" django-ajax-resp-method="GET">
+  <div class="row-fluid">main.html
+    <div class="span4" id="left_bar">
+    </div>
+    <div class="span8" id="main_container">
+		<div id="main_alert"></div>
+		<div id="main_content"></div>
+    </div>
+  </div>
+</div>	  	   
+
+<!-- uncomment and modify this DIV, if you need a custom waiting popup 
+<div id="loading">
+	<div id="loading_alert">
+                <img src="/static/img/ajax-loader.gif" /> Please Wait
+	</div>
+</div>-->
+
+<!-- add at the end of template template -->
+<script src='{{STATIC_URL}}django_ajax_resp.js' type="text/javascript" charset="utf-8"></script>
+
+{% endblock %}

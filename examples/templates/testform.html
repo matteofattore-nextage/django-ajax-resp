@@ -1,0 +1,10 @@
+
+		<form id="formElem" name="formElem" action="{% url sum1 %}" method="post" django-ajax-resp-enable="true">{% csrf_token %}
+			<div id="wrapper">
+				<fieldset  class="step">
+				    <legend>5 + 7</legend>
+					{{sum_1_form}}
+				</fieldset>
+				<button class="btn btn-large btn-info" id="add" type="submit" name="bsignup"><b>Check</b></button>
+			</div>
+		</form>
