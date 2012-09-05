@@ -8,18 +8,23 @@ from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from django.utils import simplejson
 
+#__all__ = ['ResponseItem', 'ResponseArray']
+
+
 class ResponseItem():
 
-    target = ""
-    action = ""
-    message_type = "html"
-    template = ""
-    render_values = {}
     
-    js_class = ""
-    js_class_action = "create"
+    def __init__(self, target = "", action = "", message_type = "html", template = "", render_values = {}, js_class = "", js_class_action = "create"):
+        
+        self.target = target
+        self.action = action
+        self.message_type = message_type
+        self.template = template
+        self.render_values = render_values
+        self.js_class = js_class
+        self.js_class_action = js_class_action    
     
-    def get_response_item(self, request = None):
+    def get_response_item(self, request):
         responseItem = {}
         responseItem["target"] = self.target   
         responseItem["action"] = self.action    
@@ -36,17 +41,21 @@ class ResponseItem():
 
 class ResponseArray():
 
-    response_array = []
+    def __init__ (self):
+        self.response_array = []
 
     def append(self, to_append):
         
         self.response_array.append(to_append)
 
-    def generate_response(self):
+    def generate_response(self, request):
         '''SEE ALSO: Django function json_response(x), implementation:
         def json_response(x):
         import json
         return HttpResponse(json.dumps(x, sort_keys=True, indent=2),
                             content_type='application/json; charset=UTF-8')
         ''' 
-        return HttpResponse(simplejson.dumps(self.response_array), mimetype="application/json" )
+        out_array = []
+        for resp_item in self.response_array:
+            out_array.append(resp_item.get_response_item(request))            
+        return HttpResponse(simplejson.dumps(out_array), mimetype="application/json" )
