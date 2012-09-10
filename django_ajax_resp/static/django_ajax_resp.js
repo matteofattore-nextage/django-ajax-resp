@@ -43,32 +43,40 @@ BaseController.prototype.callDjango = function (callType, urlMapping, data) {
 	
 };
 
+BaseController.prototype.django_action__html__html_load = function(responseItem) {
+	if (responseItem["type"] == "html") {
+    	if (responseItem["action"] == "html_load") {
+    		html_str = responseItem["data"];
+    		html_str = html_str.replace(/^.*Content-Type:.*$/mg, "");
+    		jQuery(responseItem["target"]).html(html_str);
+			if (responseItem["js_class"] && responseItem["js_class"] != "") {
+				if (responseItem["js_class_action"] == "create") {
+					tempObj = new window[responseItem["js_class"]](this);
+				};
+			} else {
+				//TODO: to test, new implementation allow to declare js class in a DIV of python template
+				jsDiv = jQuery(responseItem["target"]).find("div[django-ajax-js-class]");
+				if (jsDiv.length > 0) {
+					js_class = jsDiv.attr('django-ajax-js-class');
+					if (js_class != null && js_class != "") {
+						tempObj = new window[js_class](this);
+					}
+				};
+			};
+    	};
+	};	
+}
 
 BaseController.prototype.parseDjangoResponse = function (message) { 
 	var data = jQuery.parseJSON(message);
 	for(var key in data){
 	    if (data.hasOwnProperty(key)){
 	        var responseItem = data[key];
-	    	if (responseItem["type"] == "html") {
-	        	if (responseItem["action"] == "html_load") {
-	        		html_str = responseItem["data"];
-	        		html_str = html_str.replace(/^.*Content-Type:.*$/mg, "");
-	        		jQuery(responseItem["target"]).html(html_str);
-	    			if (responseItem["js_class"] && responseItem["js_class"] != "") {
-	    				if (responseItem["js_class_action"] == "create") {
-	    					tempObj = new window[responseItem["js_class"]](this);
-	    				};
-	    			} else {
-	    				//TODO: to test, new implementation allow to declare js class in a DIV of python template
-	    				jsDiv = jQuery(responseItem["target"]).find("div[django-ajax-js-class]");
-	    				if (jsDiv.length > 0) {
-	    					js_class = jsDiv.attr('django-ajax-js-class');
-	    					if (js_class != null && js_class != "") {
-	    						tempObj = new window[js_class](this);
-	    					}
-	    				};
-	    			};
-	        	};
+	    	action_funct_name = "django_action__" + responseItem["type"] + "__" + responseItem["action"];
+	    	if (this[action_funct_name] && typeof(this[action_funct_name]) === "function") {
+	    		this[action_funct_name](responseItem);
+	    	} else {
+	    		dj_ajax_log("Action function not fount (function name - " + action_funct_name + ")");
 	    	};
 		};
      };
@@ -103,7 +111,7 @@ BaseController.prototype.callBackendJson = function (callType, strURL, dataToSen
 
 BaseController.prototype.callBackend = function (callType, strURL, dataToSend, dataType, callback, errorCallback) { 
 	showLoading();
-    $.ajax( 
+    jQuery.ajax( 
             { 
                 type: callType, 
                 url: strURL,
@@ -144,6 +152,12 @@ hideLoading = function() {
 	jQuery("#loading").hide();
 };
 
+function dj_ajax_log(msg) {
+    setTimeout(function() {
+        throw new Error(">> dj_ajax_log: " + msg);
+    }, 0);
+}
+
 jQuery(function() {
 	if (window.django_controller === undefined) {
 		django_controller = new BaseController();				
@@ -151,7 +165,7 @@ jQuery(function() {
 	jQuery("div[django-ajax-resp-url]").each(function(index) {
 		window.django_controller.init(jQuery(this).attr('django-ajax-resp-url'), jQuery(this).attr('django-ajax-resp-method'));
 	});
-	if ($("div#loading").length > 0){
+	if (jQuery("div#loading").length > 0){
 		// ok ... nel template django è stato ridefinito un div con la clessidra
 	} else {
 		// lo aggiungo io
