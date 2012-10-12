@@ -49,9 +49,10 @@ Move a form to ajax:
 				<button class="btn btn-large btn-info" id="add" type="submit" name="bsignup"><b>Check</b></button>
 			</div>
 		</form>
-		
-	note: action="{% url sum1 %}" contains the reference to the url defined in url.py, that refers the view written to validate and elaborate the form post.
-	
+note: 
+- action="{% url sum1 %}": contains the reference to the url defined in url.py, that refers the view written to validate and elaborate the form post.
+- django-ajax-resp-enable="true": enable the form to use "django-ajax" post.
+
 3) 
 
 Substitute all:
