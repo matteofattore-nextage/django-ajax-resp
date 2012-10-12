@@ -56,7 +56,7 @@ setup(
     version=version,
     url='https://github.com/matteofattore-nextage/django-ajax-resp',
     download_url='https://github.com/matteofattore-nextage/django-ajax-resp/zipball/master',
-    license='',
+    license='Apache 2',
     description='A lightweight ajax framework for Django.',
     author='Matteo Fattore',
     author_email='matteo.fattore@nextage-on.com',

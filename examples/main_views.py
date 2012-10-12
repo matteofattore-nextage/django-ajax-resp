@@ -11,7 +11,7 @@ def load_main(request):
     
     sum_1_form_resp = ResponseItem()
     sum_1_form_resp.render_values = {'sum_1_form' : sum_1_form}
-    sum_1_form_resp.target = "#main_content"
+    sum_1_form_resp.target = "#main_content" # the div to update
     sum_1_form_resp.action = "html_load"
     #js_class = "<JS_CLASS_NAME>"
     sum_1_form_resp.template = 'testform.html'
@@ -31,11 +31,11 @@ def sum1(request):
                 alert.template = 'success.html'
                 sum_1_form.clean()
             else:
-                alert.template = 'fail.html'
+                alert.template = 'fail.html' 
         else:
             alert.template = 'fail.html'
            
-        alert.target = "#main_alert"
+        alert.target = "#main_alert"  #the div to update with the result of the form submission
         r_a.append(alert)
                 
         sum_1_form_resp = ResponseItem()
@@ -43,7 +43,7 @@ def sum1(request):
         sum_1_form_resp.target = "#main_content"
         sum_1_form_resp.action = "html_load"
         #js_class = "<JS_CLASS_NAME>"
-        sum_1_form_resp.template = 'testform.html'
+        sum_1_form_resp.template = 'testform.html'  #the div to update with form 
         r_a.append(sum_1_form_resp)
         
         return r_a.generate_response(request)
