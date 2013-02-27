@@ -35,7 +35,8 @@ class ResponseItem():
                                   context_instance=RequestContext(request)) )
         responseItem["js_class"] = self.js_class
         responseItem["js_class_action"] = self.js_class_action
-
+        print "Generated response: " + responseItem["target"]
+        print responseItem["data"]
         return responseItem
 
 

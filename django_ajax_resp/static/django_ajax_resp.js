@@ -18,16 +18,16 @@ BaseController.prototype.init = function (url, method) {
 
 
 
-BaseController.prototype.submitForm = function(form_id, action, method){
-	var form = jQuery("#"+form_id);
+BaseController.prototype.submitForm = function(form_id, action, method) {
+	var form = jQuery("#" + form_id);
 	var data = form.serializeArray();
 	var urlMapping = form.attr('action');
 	if (action != undefined) {
-		urlMapping = action;
+		var urlMapping = action;
 	}
 	var html_method = form.attr('method');
 	if (method != undefined) {
-		html_method = method;
+		var html_method = method;
 	}
 	this.callDjango(html_method, urlMapping, data);
 };
@@ -37,10 +37,13 @@ BaseController.prototype.submitForm = function(form_id, action, method){
  * 
  * param: type - POST or GET
  */
-
-BaseController.prototype.callDjango = function (callType, urlMapping, data) { 
-	this.callBackendHtml(callType, urlMapping, data, jQuery.proxy(this.parseDjangoResponse, this));
+BaseController.prototype.callDjango = function (callType, urlMapping, data) {
+	dj_ajax_log("callDjango");
+	dj_ajax_log("- callType:  " + callType);
+	dj_ajax_log("- data:      " + data);
+	dj_ajax_log("- url:       " + urlMapping);
 	
+	this.callBackendHtml(callType, urlMapping, data, jQuery.proxy(this.parseDjangoResponse, this));
 };
 
 BaseController.prototype.django_action__html__html_load = function(responseItem) {
@@ -48,26 +51,120 @@ BaseController.prototype.django_action__html__html_load = function(responseItem)
     	if (responseItem["action"] == "html_load") {
     		html_str = responseItem["data"];
     		html_str = html_str.replace(/^.*Content-Type:.*$/mg, "");
-    		jQuery(responseItem["target"]).html(html_str);
-			if (responseItem["js_class"] && responseItem["js_class"] != "") {
-				if (responseItem["js_class_action"] == "create") {
-					tempObj = new window[responseItem["js_class"]](this);
-				};
-			} else {
-				//TODO: to test, new implementation allow to declare js class in a DIV of python template
-				jsDiv = jQuery(responseItem["target"]).find("div[django-ajax-js-class]");
-				if (jsDiv.length > 0) {
-					js_class = jsDiv.attr('django-ajax-js-class');
-					if (js_class != null && js_class != "") {
-						tempObj = new window[js_class](this);
-					}
-				};
-			};
+    		target_div = jQuery(responseItem["target"]);
+    		if (target_div.length > 0) {
+    			target_div.html(html_str);   			
+    		} else {
+    			dj_ajax_log("Target DIV '" + responseItem["target"] + "' doesn't exist.");
+    		};
+    		this.django_action_html_execute_response_js(responseItem);
     	};
 	};	
 }
 
-BaseController.prototype.parseDjangoResponse = function (message) { 
+BaseController.prototype.django_action_html_execute_response_js = function(responseItem) {
+	if (responseItem["js_class"] && responseItem["js_class"] != "") {
+		if (responseItem["js_class_action"] == "create") {
+			tempObj = new window[responseItem["js_class"]](this);
+		};
+	} else {
+		//TODO: to test, new implementation allow to declare js class in a DIV of python template
+		jsDiv = jQuery(responseItem["target"]).find("div[django-ajax-js-class]");
+		if (jsDiv.length > 0) {
+			js_class = jsDiv.attr('django-ajax-js-class');
+			if (js_class != null && js_class != "") {
+				tempObj = new window[js_class](this);
+			}
+		};
+	};
+}
+
+
+BaseController.prototype.django_action__html__html_append = function(responseItem) {
+	if (responseItem["type"] == "html") {
+    	if (responseItem["action"] == "html_append") {
+    		html_str = responseItem["data"];
+    		html_str = html_str.replace(/^.*Content-Type:.*$/mg, "");
+    		target_div = jQuery(responseItem["target"]);
+    		if (target_div.length > 0) {
+    			target_div.append(html_str);   			
+    		} else {
+    			dj_ajax_log("Target DIV '" + responseItem["target"] + "' doesn't exist.");
+    		};
+    		this.django_action_html_execute_response_js(responseItem);
+    	};
+	};	
+}
+
+BaseController.prototype.django_action__html__html_remove = function(responseItem) {
+	if (responseItem["type"] == "html") {
+    	if (responseItem["action"] == "html_remove") {
+    		target_div = jQuery(responseItem["target"]);
+    		if (target_div.length > 0) {
+    			target_div.remove(html_str);   			
+    		} else {
+    			dj_ajax_log("Target DIV '" + responseItem["target"] + "' doesn't exist.");
+    		};
+    		this.django_action_html_execute_response_js(responseItem);
+    	};
+	};	
+}
+
+BaseController.prototype.django_action__html__html_ = function(responseItem) {
+	if (responseItem["type"] == "html") {
+    	if (responseItem["action"] == "html_remove") {
+    		target_div = jQuery(responseItem["target"]);
+    		if (target_div.length > 0) {
+    			target_div.remove(html_str);   			
+    		} else {
+    			dj_ajax_log("Target DIV '" + responseItem["target"] + "' doesn't exist.");
+    		};
+    		this.django_action_html_execute_response_js(responseItem);
+    	};
+	};	
+}
+
+BaseController.prototype.django_action__html__html_popup = function(responseItem) {
+	if (responseItem["type"] == "html") {
+    	if (responseItem["action"] == "html_popup") {
+    		html_str = responseItem["data"];
+    		html_str = html_str.replace(/^.*Content-Type:.*$/mg, "");
+    		
+    		var modalDivs = jQuery("div#django_ajax_resp_modal_div")
+    		if (modalDivs.length > 0)
+				modalDivs.remove();
+			
+			jQuery("body").append('<div id="django_ajax_resp_modal_div" class="modal fade">' +
+					html_str +
+					'</div>');
+			jQuery('#django_ajax_resp_modal_div').modal();
+    	}
+	}
+}
+
+
+BaseController.prototype.django_action__html__html_popup_error = function(responseItem) {
+	if (responseItem["type"] == "html") {
+    	if (responseItem["action"] == "html_popup") {
+    		html_str = responseItem["data"];
+    		html_str = html_str.replace(/^.*Content-Type:.*$/mg, "");
+    		
+    		var modalDivs = jQuery("div#django_ajax_resp_modal_div")
+    		if (modalDivs.length > 0)
+				modalDivs.remove();
+			
+			jQuery("body").append('<div id="django_ajax_resp_modal_div" class="modal fade">' +
+					html_str +
+					'</div>');
+			jQuery('#django_ajax_resp_modal_div').modal();
+    	}
+	}
+}
+
+
+BaseController.prototype.parseDjangoResponse = function (message) {
+	dj_ajax_log("parseDjangoResponse");
+
 	var data = jQuery.parseJSON(message);
 	for(var key in data){
 	    if (data.hasOwnProperty(key)){
@@ -79,21 +176,22 @@ BaseController.prototype.parseDjangoResponse = function (message) {
 	    		dj_ajax_log("Action function not fount (function name - " + action_funct_name + ")");
 	    	};
 		};
-     };
-		
+    };
+	
+    var forms = jQuery("form[django-ajax-resp-enable]");
 
-     var forms = jQuery("form[django-ajax-resp-enable]");
-
-     for(var i=0;i<forms.length;i++){
-        form = jQuery(forms[i]);    // A DOM element, not a jQuery object
+    for(var i=0; i<forms.length; i++) {
+        var form = jQuery(forms[i]);    // A DOM element, not a jQuery object
    		if (form.attr('django-ajax-resp-enable') === "true") {
  			form.submit(jQuery.proxy(function (e) {
  			    // prevent normal submit behaviour
  			    e.preventDefault();
+ 			    dj_ajax_log("- e.target.id: " + e.target.id);
  				this.submitForm(e.target.id);
+ 				hidePopup();
  			}, this));
  		}
-	  };
+	};
 };
 
 BaseController.prototype.callBackendHtml = function (callType, strURL, dataToSend, callback, errorCallback) { 
@@ -137,7 +235,7 @@ BaseController.prototype.callBackend = function (callType, strURL, dataToSend, d
                         }
                     else
                         {
-                        	log('ajax call - Nothing came back....');
+                        	dj_ajax_log('ajax call - Nothing came back....');
                         }
                  }, this)
              }
@@ -145,17 +243,22 @@ BaseController.prototype.callBackend = function (callType, strURL, dataToSend, d
 };
 
 showLoading = function() {
-	jQuery("#loading").show();
+	jQuery("#django_ajax_resp_loading_div").show();
 };
 
 hideLoading = function() {
-	jQuery("#loading").hide();
+	jQuery("#django_ajax_resp_loading_div").hide();
 };
 
+hidePopup = function() {
+	jQuery('#django_ajax_resp_modal_div').modal('hide');
+}
+
+
 function dj_ajax_log(msg) {
-    setTimeout(function() {
-        throw new Error(">> dj_ajax_log: " + msg);
-    }, 0);
+    if (typeof console != "undefined") { 
+        console.log(">> dj_ajax_log: " + msg); 
+    }
 }
 
 jQuery(function() {
@@ -163,19 +266,38 @@ jQuery(function() {
 		django_controller = new BaseController();				
 	}
 	jQuery("div[django-ajax-resp-url]").each(function(index) {
-		window.django_controller.init(jQuery(this).attr('django-ajax-resp-url'), jQuery(this).attr('django-ajax-resp-method'));
+		var url = jQuery(this).attr('django-ajax-resp-url');
+		if (url == 'self') {
+			url = location.href;
+		}
+		window.django_controller.init(url, jQuery(this).attr('django-ajax-resp-method'));
 	});
-	if (jQuery("div#loading").length > 0){
+	if (jQuery("div#django_ajax_resp_loading_div").length > 0) {
 		// ok ... nel template django è stato ridefinito un div con la clessidra
 	} else {
 		// lo aggiungo io
-		jQuery("body").append('<div id="loading"> ' +
-				' <div id="loading_alert">'	+
+		jQuery("body").append('<div id="django_ajax_resp_loading_div"> ' +
+				' <div id="django_ajax_resp_loading_alert_div">'	+
 				'	 Please Wait' +
 				'	</div>'+
 				'	</div>'+
 			'');
 	}
+	
+	jQuery("a[django-ajax-resp-url]").each(function(index, e) {
+		var elem = jQuery(e);
+		elem.click(function () {
+			
+			var callType = "GET";
+			var url = elem.attr('django-ajax-resp-url');
+			
+			dj_ajax_log('url: ' + url);
+			
+			window.django_controller.callDjango(callType, url, {});
+			
+			return false;
+		});
+	});
 });
 
 
