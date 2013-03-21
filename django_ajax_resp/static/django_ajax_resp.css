@@ -1,5 +1,5 @@
 
-#loading {
+#django_ajax_resp_loading_div {
     display: none;
     position: fixed;
     left: 0;
@@ -13,13 +13,13 @@
     z-index: 15000;
 }
 
-#loading #loading_alert img{
+#django_ajax_resp_loading_div #django_ajax_resp_loading_alert_div img{
     vertical-align:middle;
 	display:block;
 	margin: 8px;
 }
 
-#loading_alert{
+#django_ajax_resp_loading_alert_div{
 	position:relative;
 	margin: auto;
     display:block;
