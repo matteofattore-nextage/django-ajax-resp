@@ -272,7 +272,17 @@ jQuery(function() {
 		}
 		window.django_controller.init(url, jQuery(this).attr('django-ajax-resp-method'));
 	});
-	if (jQuery("div#django_ajax_resp_loading_div").length > 0) {
+    jQuery("div[django-ajax-resp-timed-url]").each(function(index) {
+        var url = jQuery(this).attr('django-ajax-resp-timed-url');
+        //lapse is the time that elapses between two automatic calls in milliseconds, the default value is 1 minute (60000 milliseconds)
+        var lapse = jQuery(this).attr('django-ajax-resp-timed-lapse') || 60000
+        if (url == 'self') {
+            url = location.href;
+        }
+        setInterval(window.django_controller.callDjango(url, jQuery(this).attr('django-ajax-resp-timed-method')), lapse);
+    });
+
+    if (jQuery("div#django_ajax_resp_loading_div").length > 0) {
 		// ok ... nel template django è stato ridefinito un div con la clessidra
 	} else {
 		// lo aggiungo io
