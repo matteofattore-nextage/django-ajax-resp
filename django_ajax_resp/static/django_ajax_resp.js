@@ -279,7 +279,7 @@ jQuery(function() {
         if (url == 'self') {
             url = location.href;
         }
-        setInterval(window.django_controller.callDjango(url, jQuery(this).attr('django-ajax-resp-timed-method')), lapse);
+        setInterval(window.django_controller.init(url, jQuery(this).attr('django-ajax-resp-timed-method')), lapse);
     });
 
     if (jQuery("div#django_ajax_resp_loading_div").length > 0) {
