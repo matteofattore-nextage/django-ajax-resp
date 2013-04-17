@@ -25,14 +25,18 @@ class ResponseItem():
         self.js_class_action = js_class_action    
     
     def get_response_item(self, request):
+
         responseItem = {}
-        responseItem["target"] = self.target   
+        responseItem["target"] = self.target
         responseItem["action"] = self.action    
         responseItem["type"] = self.message_type
-        responseItem["data"] = str(render_to_response(
+        if self.message_type.upper() == 'HTML' :
+            responseItem["data"] = str(render_to_response(
                                   self.template, 
                                   self.render_values,
                                   context_instance=RequestContext(request)) )
+        else:
+            responseItem["data"] = self.render_values
         responseItem["js_class"] = self.js_class
         responseItem["js_class_action"] = self.js_class_action
         #print "Generated response: " + responseItem["target"]
