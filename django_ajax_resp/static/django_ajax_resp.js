@@ -279,8 +279,8 @@ jQuery(function() {
         if (url == 'self') {
             url = location.href;
         }
-        dj_ajax_log("'Django ajax resp framework' setup a autocall to '" + url + "'  every  " + lapse + " milliseconds.");
-        setInterval(window.django_controller.init(url, jQuery(this).attr('django-ajax-resp-timed-method')), lapse);
+        dj_ajax_log("'Django ajax resp framework' initiated the timed autocall to '" + url + "'  every  " + lapse + " milliseconds.");
+        setInterval(function() {window.django_controller.init(url, jQuery(this).attr('django-ajax-resp-timed-method'))}, lapse);
     });
 
     if (jQuery("div#django_ajax_resp_loading_div").length > 0) {
