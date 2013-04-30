@@ -207,8 +207,7 @@ BaseController.prototype.callBackendJson = function (callType, strURL, dataToSen
 };
 	
 
-BaseController.prototype.callBackend = function (callType, strURL, dataToSend, dataType, callback, errorCallback) { 
-	showLoading();
+BaseController.prototype.callBackend = function (callType, strURL, dataToSend, dataType, callback, errorCallback) {
     jQuery.ajax( 
             { 
                 type: callType, 
