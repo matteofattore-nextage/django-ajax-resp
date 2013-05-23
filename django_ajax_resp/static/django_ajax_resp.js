@@ -18,9 +18,12 @@ BaseController.prototype.init = function (url, method) {
 
 
 
-BaseController.prototype.submitForm = function(form_id, action, method) {
+BaseController.prototype.submitForm = function(form_id, clicked_button, action, method) {
 	var form = jQuery("#" + form_id);
 	var data = form.serializeArray();
+	if (clicked_button != undefined) {
+        data['clicked'] = jQuery(clicked_button).val();
+    }
 	var urlMapping = form.attr('action');
 	if (action != undefined) {
 		var urlMapping = action;
@@ -183,13 +186,24 @@ BaseController.prototype.parseDjangoResponse = function (message) {
     for(var i=0; i<forms.length; i++) {
         var form = jQuery(forms[i]);    // A DOM element, not a jQuery object
    		if (form.attr('django-ajax-resp-enable') === "true") {
- 			form.submit(jQuery.proxy(function (e) {
- 			    // prevent normal submit behaviour
- 			    e.preventDefault();
- 			    dj_ajax_log("- e.target.id: " + e.target.id);
- 				this.submitForm(e.target.id);
- 				hidePopup();
- 			}, this));
+ 			form.find(":submit").live('click', function() {
+                jQuery.proxy(function (e) {
+                    // prevent normal submit behaviour
+                    e.preventDefault();
+                    dj_ajax_log("- e.target.id: " + e.target.id);
+                    this.submitForm(form_id=e.target.id, clicked_button=this);
+                    hidePopup();
+                }, this);
+                //prevent normal submit to pass button value
+                return false;
+            });
+            form.submit(jQuery.proxy(function (e) {
+                    // prevent normal submit behaviour
+                    e.preventDefault();
+                    dj_ajax_log("- e.target.id: " + e.target.id);
+                    this.submitForm(e.target.id);
+                    hidePopup();
+            }, this));
  		}
 	};
 };
