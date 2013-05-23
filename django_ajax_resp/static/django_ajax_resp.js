@@ -22,7 +22,7 @@ BaseController.prototype.submitForm = function(form_id, clicked_button, action, 
 	var form = jQuery("#" + form_id);
 	var data = form.serializeArray();
 	if (clicked_button != undefined) {
-        data['clicked_button'] = jQuery(clicked_button).val();
+        data.push({'name': 'clicked_button', 'value': jQuery(clicked_button).val()});
     }
 	var urlMapping = form.attr('action');
 	if (action != undefined) {
