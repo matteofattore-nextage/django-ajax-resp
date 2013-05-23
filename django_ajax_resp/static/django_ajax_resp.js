@@ -188,7 +188,7 @@ BaseController.prototype.parseDjangoResponse = function (message) {
    		if (form.attr('django-ajax-resp-enable') === "true") {
  			form.find(":submit").on('click', function() {
                 dj_ajax_log("- clicked_button.id: " + this.id);
-                jQuery.proxy(window.django_controller.submitForm(form_id=this.id, clicked_button=this), window.django_controller);
+                jQuery.proxy(window.django_controller.submitForm(form_id=this.form.id, clicked_button=this), window.django_controller);
                 hidePopup();
                 //prevent normal submit to pass button value
                 return false;
