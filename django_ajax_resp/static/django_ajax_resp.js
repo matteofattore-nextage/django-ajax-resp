@@ -188,7 +188,6 @@ BaseController.prototype.parseDjangoResponse = function (message) {
  			    e.preventDefault();
  			    dj_ajax_log("- e.target.id: " + e.target.id);
  				this.submitForm(e.target.id);
- 				hidePopup();
  			}, this));
  		}
 	};
