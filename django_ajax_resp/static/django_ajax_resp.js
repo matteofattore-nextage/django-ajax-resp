@@ -164,6 +164,36 @@ BaseController.prototype.django_action__html__html_popup_error = function(respon
 	}
 }
 
+BaseController.prototype.django_action__redirect__post = function(responseItem) {
+	if (responseItem["type"] == "redirect") {
+    	if (responseItem["action"] == "post") {
+    		post_data = responseItem["data"];
+            target_url = responseItem["target"];
+    		post_data = post_data.replace(/^.*Content-Type:.*$/mg, "");
+
+
+
+            var form = document.createElement('form');
+            form.action = target_url;
+            form.method = 'post';
+
+            for (var key in post_data) {
+                if (post_data.hasOwnProperty(key)) {
+                    var field = document.createElement('input');
+                    field.type = 'hidden';
+                    field.name = key;
+                    field.value = post_data[key]
+
+                    form.appendChild(field);
+                }
+            }
+
+            document.body.appendChild(form);
+            form.submit();
+    	}
+	}
+}
+
 
 BaseController.prototype.parseDjangoResponse = function (message) {
 	dj_ajax_log("parseDjangoResponse");
