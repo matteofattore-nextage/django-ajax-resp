@@ -153,7 +153,7 @@ BaseController.prototype.django_action__html__html_popup_error = function(respon
     		html_str = responseItem["data"];
     		html_str = html_str.replace(/^.*Content-Type:.*$/mg, "");
     		
-    		var modalDivs = jQuery("div#django_ajax_resp_modal_div");
+    		var modalDivs = jQuery("div#django_ajax_resp_modal_div")
     		if (modalDivs.length > 0)
 				modalDivs.remove();
 			
