@@ -173,7 +173,7 @@ BaseController.prototype.django_action__redirect__post = function(responseItem) 
     	if (responseItem["action"] == "post") {
     		post_data = responseItem["data"];
             target_url = responseItem["target"];
-    		post_data = post_data.replace(/^.*Content-Type:.*$/mg, "");
+    		//post_data = post_data.replace(/^.*Content-Type:.*$/mg, "");
 
             var form = document.createElement('form');
             form.action = target_url;
