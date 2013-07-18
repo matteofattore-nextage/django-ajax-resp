@@ -45,7 +45,10 @@ BaseController.prototype.callDjango = function (callType, urlMapping, data) {
 	dj_ajax_log("- callType:  " + callType);
 	dj_ajax_log("- data:      " + data);
 	dj_ajax_log("- url:       " + urlMapping);
-	data.push({'django-ajax-resp': true});
+
+    if (data != null) {
+	    data.push({'django-ajax-resp': true});
+    }
 
 	this.callBackendHtml(callType, urlMapping, data, jQuery.proxy(this.parseDjangoResponse, this));
 };
