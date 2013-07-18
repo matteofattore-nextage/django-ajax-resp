@@ -45,7 +45,8 @@ BaseController.prototype.callDjango = function (callType, urlMapping, data) {
 	dj_ajax_log("- callType:  " + callType);
 	dj_ajax_log("- data:      " + data);
 	dj_ajax_log("- url:       " + urlMapping);
-	
+	data.push({'django-ajax-resp': true});
+
 	this.callBackendHtml(callType, urlMapping, data, jQuery.proxy(this.parseDjangoResponse, this));
 };
 
@@ -152,7 +153,7 @@ BaseController.prototype.django_action__html__html_popup_error = function(respon
     		html_str = responseItem["data"];
     		html_str = html_str.replace(/^.*Content-Type:.*$/mg, "");
     		
-    		var modalDivs = jQuery("div#django_ajax_resp_modal_div")
+    		var modalDivs = jQuery("div#django_ajax_resp_modal_div");
     		if (modalDivs.length > 0)
 				modalDivs.remove();
 			
@@ -170,8 +171,6 @@ BaseController.prototype.django_action__redirect__post = function(responseItem) 
     		post_data = responseItem["data"];
             target_url = responseItem["target"];
     		post_data = post_data.replace(/^.*Content-Type:.*$/mg, "");
-
-
 
             var form = document.createElement('form');
             form.action = target_url;
