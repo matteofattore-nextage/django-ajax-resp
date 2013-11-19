@@ -46,7 +46,7 @@ BaseController.prototype.callDjango = function (callType, urlMapping, data) {
 	dj_ajax_log("- data:      " + data);
 	dj_ajax_log("- url:       " + urlMapping);
 
-    if (data != null) {
+    if (data != null && data instanceof Array) {
 	    data.push({'django-ajax-resp': true});
     }
 
@@ -141,10 +141,23 @@ BaseController.prototype.django_action__html__html_popup = function(responseItem
     		if (modalDivs.length > 0)
 				modalDivs.remove();
 			
-			jQuery("body").append('<div id="django_ajax_resp_modal_div" class="modal fade">' +
+            jQuery("body").append('<div id="django_ajax_resp_modal_div" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">' +
 					html_str +
 					'</div>');
 			jQuery('#django_ajax_resp_modal_div').modal();
+    	}
+	}
+}
+
+
+BaseController.prototype.django_action__html__popup_close = function(responseItem) {
+	if (responseItem["type"] == "html") {
+    	if (responseItem["action"] == "popup_close") {
+    		var modalDivs = jQuery("div#django_ajax_resp_modal_div")
+    		if (modalDivs.length > 0){
+                modalDivs.modal('hide');
+                jQuery("body").remove("div#django_ajax_resp_modal_div");
+            }
     	}
 	}
 }
@@ -174,28 +187,65 @@ BaseController.prototype.django_action__redirect__post = function(responseItem) 
     		post_data = responseItem["data"];
             target_url = responseItem["target"];
     		//post_data = post_data.replace(/^.*Content-Type:.*$/mg, "");
-
-            var form = document.createElement('form');
-            form.action = target_url;
-            form.method = 'post';
-
-            for (var key in post_data) {
-                if (post_data.hasOwnProperty(key)) {
-                    var field = document.createElement('input');
-                    field.type = 'hidden';
-                    field.name = key;
-                    field.value = post_data[key]
-
-                    form.appendChild(field);
-                }
-            }
-
-            document.body.appendChild(form);
-            form.submit();
+            this.redirect("post", target_url, post_data);
     	}
 	}
 }
 
+
+BaseController.prototype.redirect = function(callType, urlMapping, data) {
+    var form = document.createElement('form');
+    form.action = urlMapping;
+    form.method = callType;
+
+    for (var key in data) {
+        if (data.hasOwnProperty(key)) {
+            var field = document.createElement('input');
+            field.type = 'hidden';
+            field.name = key;
+            field.value = data[key];
+
+            form.appendChild(field);
+        }
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+}
+
+
+BaseController.prototype.enableForms = function () {
+    var forms = jQuery("form[django-ajax-resp-enable]");
+
+    for (var i = 0; i < forms.length; i++) {
+        var form = jQuery(forms[i]);    // A DOM element, not a jQuery object
+        if (form.attr('django-ajax-resp-enable') === "true") {
+            form.find(":submit").on('click', function () {
+                dj_ajax_log("- clicked_button.id: " + this.id);
+                jQuery.proxy(window.django_controller.submitForm(form_id = this.form.id, clicked_button = this), window.django_controller);
+                //prevent normal submit to pass button value
+                return false;
+            });
+            form.submit(jQuery.proxy(function (e) {
+                // prevent normal submit behaviour
+                e.preventDefault();
+                dj_ajax_log("- e.target.id: " + e.target.id);
+                this.submitForm(e.target.id);
+            }, this));
+        }
+    }
+    //if ajax upload is loaeded, discover file field
+    try
+    {
+        jQuery(function() {
+            AjaxUploadWidget.autoDiscover();
+        });
+    }
+    catch(e)
+    {
+        console.log('problemi caricamento libreria ajax_upload');
+    }
+};
 
 BaseController.prototype.parseDjangoResponse = function (message) {
 	dj_ajax_log("parseDjangoResponse");
@@ -212,26 +262,7 @@ BaseController.prototype.parseDjangoResponse = function (message) {
 	    	};
 		};
     };
-	
-    var forms = jQuery("form[django-ajax-resp-enable]");
-
-    for(var i=0; i<forms.length; i++) {
-        var form = jQuery(forms[i]);    // A DOM element, not a jQuery object
-   		if (form.attr('django-ajax-resp-enable') === "true") {
- 			form.find(":submit").on('click', function() {
-                dj_ajax_log("- clicked_button.id: " + this.id);
-                jQuery.proxy(window.django_controller.submitForm(form_id=this.form.id, clicked_button=this), window.django_controller);
-                //prevent normal submit to pass button value
-                return false;
-            });
-            form.submit(jQuery.proxy(function (e) {
-                    // prevent normal submit behaviour
-                    e.preventDefault();
-                    dj_ajax_log("- e.target.id: " + e.target.id);
-                    this.submitForm(e.target.id);
-            }, this));
- 		}
-	};
+    this.enableForms();
 };
 
 BaseController.prototype.callBackendHtml = function (callType, strURL, dataToSend, callback, errorCallback) { 
@@ -253,7 +284,7 @@ BaseController.prototype.callBackend = function (callType, strURL, dataToSend, d
                 type: callType, 
                 url: strURL,
                 dataType: dataType,
-                contentType: 'application/json',
+                contentType: 'application/x-www-form-urlencoded',
                 data: dataToSend,
                 context:this,
                 success: jQuery.proxy(function(message)  {
@@ -348,6 +379,7 @@ jQuery(function() {
 			return false;
 		});
 	});
+    window.django_controller.enableForms();
 });
 
 
