@@ -27,7 +27,7 @@ class ResponseItem():
     def get_response_item(self, request):
 
         responseItem = {}
-        responseItem["target"] = self.target
+        responseItem["target"] = self.target  #a div if type = HTML, javascript object if JAVASCRIPT (in JAVASCRIPT case if object instance doesn't exist, try to use js_class to instance a new one)
         responseItem["action"] = self.action    
         responseItem["type"] = self.message_type
         if self.message_type.upper() == 'HTML' :
@@ -35,6 +35,10 @@ class ResponseItem():
                                   self.template, 
                                   self.render_values,
                                   context_instance=RequestContext(request)) )
+        elif self.message_type.upper() == 'JAVASCRIPT' :
+
+            #js_data = simplejson.dumps(self.render_values)
+            responseItem["data"] = self.render_values
         else:
             responseItem["data"] = self.render_values
         responseItem["js_class"] = self.js_class

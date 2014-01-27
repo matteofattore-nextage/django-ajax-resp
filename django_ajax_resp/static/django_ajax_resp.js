@@ -53,6 +53,40 @@ BaseController.prototype.callDjango = function (callType, urlMapping, data) {
 	this.callBackendHtml(callType, urlMapping, data, jQuery.proxy(this.parseDjangoResponse, this));
 };
 
+BaseController.prototype._getReference = function (string, root) {
+    root = root || this; return string.split(".").reduce(function(ref, item) { return ref[item] }, root)
+};
+//and use as var o = new getReference("Namespace.MyClass")()
+
+BaseController.prototype.django_action__javascript = function(responseItem) {
+	if (responseItem["type"] == "javascript") {
+        response_action = responseItem["action"];
+        response_data = responseItem["data"];
+        target_obj = responseItem["target"];
+        //if the action is "recreate". we create a new instance of the object
+        if (response_action.toLowerCase() == "recreate") {
+            dj_ajax_log("Action is '" + response_action + "'. I will create a instance of js_class.");
+            window[target_obj] = new (this._getReference(responseItem["js_class"], window))(response_data);
+            return;
+        } else if (typeof window[target_obj] == "undefined") {
+            dj_ajax_log("Target object '" + responseItem["target"] + "' doesn't exist. I will create a instance of js_class.");
+            window[target_obj] = new (eval(responseItem["js_class"]))(response_data);
+        }
+
+        if(typeof window[target_obj][response_action] == "function") {
+            window[target_obj][response_action](response_data)
+        } else {
+            //is a variable
+            window[target_obj][response_action] = response_data
+        }
+
+
+
+
+	};
+}
+
+
 BaseController.prototype.django_action__html__html_load = function(responseItem) {
 	if (responseItem["type"] == "html") {
     	if (responseItem["action"] == "html_load") {
@@ -104,20 +138,6 @@ BaseController.prototype.django_action__html__html_append = function(responseIte
 }
 
 BaseController.prototype.django_action__html__html_remove = function(responseItem) {
-	if (responseItem["type"] == "html") {
-    	if (responseItem["action"] == "html_remove") {
-    		target_div = jQuery(responseItem["target"]);
-    		if (target_div.length > 0) {
-    			target_div.remove(html_str);   			
-    		} else {
-    			dj_ajax_log("Target DIV '" + responseItem["target"] + "' doesn't exist.");
-    		};
-    		this.django_action_html_execute_response_js(responseItem);
-    	};
-	};	
-}
-
-BaseController.prototype.django_action__html__html_ = function(responseItem) {
 	if (responseItem["type"] == "html") {
     	if (responseItem["action"] == "html_remove") {
     		target_div = jQuery(responseItem["target"]);
@@ -238,7 +258,10 @@ BaseController.prototype.enableForms = function () {
     try
     {
         jQuery(function() {
-            AjaxUploadWidget.autoDiscover();
+            //I check if AjaxUploadWidget is defined
+            if (typeof AjaxUploadWidget !== 'undefined') {
+                AjaxUploadWidget.autoDiscover();
+            }
         });
     }
     catch(e)
@@ -247,6 +270,13 @@ BaseController.prototype.enableForms = function () {
     }
 };
 
+
+
+
+
+
+
+
 BaseController.prototype.parseDjangoResponse = function (message) {
 	dj_ajax_log("parseDjangoResponse");
 
@@ -254,7 +284,12 @@ BaseController.prototype.parseDjangoResponse = function (message) {
 	for(var key in data){
 	    if (data.hasOwnProperty(key)){
 	        var responseItem = data[key];
-	    	action_funct_name = "django_action__" + responseItem["type"] + "__" + responseItem["action"];
+            var response_type = responseItem["type"].toLowerCase();
+            if (response_type == 'javascript')
+                action_funct_name = "django_action__" + response_type;
+            else
+                action_funct_name = "django_action__" + response_type + "__" + responseItem["action"];
+
 	    	if (this[action_funct_name] && typeof(this[action_funct_name]) === "function") {
 	    		this[action_funct_name](responseItem);
 	    	} else {
