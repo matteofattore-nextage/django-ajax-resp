@@ -7,16 +7,16 @@ var BaseController = function () {
 };
 
 
-BaseController.prototype.init = function (url, method) {
+BaseController.prototype.init = function (url, method, caller_html_elem_id) {
     if (method == undefined) {
         method = "GET";
     }
-    this.callDjango(method, url, null);
+    this.callDjango(method, url, null, caller_html_elem_id);
 
 };
 
 
-BaseController.prototype.submitForm = function (form_id, clicked_button, action, method) {
+BaseController.prototype.submitForm = function (form_id, clicked_button, action, method, caller_html_elem_id) {
     var form = jQuery("#" + form_id);
     var data = form.serializeArray();
     if (clicked_button != undefined) {
@@ -30,7 +30,7 @@ BaseController.prototype.submitForm = function (form_id, clicked_button, action,
     if (method != undefined) {
         var html_method = method;
     }
-    this.callDjango(html_method, urlMapping, data);
+    this.callDjango(html_method, urlMapping, data, caller_html_elem_id);
 };
 
 /*
@@ -38,14 +38,19 @@ BaseController.prototype.submitForm = function (form_id, clicked_button, action,
  * 
  * param: type - POST or GET
  */
-BaseController.prototype.callDjango = function (callType, urlMapping, data) {
+BaseController.prototype.callDjango = function (callType, urlMapping, data, caller_html_elem_id) {
     dj_ajax_log("callDjango");
     dj_ajax_log("- callType:  " + callType);
     dj_ajax_log("- data:      " + data);
     dj_ajax_log("- url:       " + urlMapping);
 
-    if (data != null && data instanceof Array) {
-        data.push({'django-ajax-resp': true});
+    if (data == null || data == undefined) {
+        data = []
+    }
+    data.push({'django-ajax-resp': true});
+    if (caller_html_elem_id != undefined) {
+        data.push({'caller_html_elem_id': caller_html_elem_id});
+
     }
 
     this.callBackendHtml(callType, urlMapping, data, jQuery.proxy(this.parseDjangoResponse, this));
@@ -265,7 +270,7 @@ BaseController.prototype.enableForms = function () {
         if (form.attr('django-ajax-resp-enable') === "true") {
             form.find(":submit").on('click', function () {
                 dj_ajax_log("- clicked_button.id: " + this.id);
-                jQuery.proxy(window.django_controller.submitForm(form_id = this.form.id, clicked_button = this), window.django_controller);
+                jQuery.proxy(window.django_controller.submitForm(form_id = this.form.id, clicked_button = this, this.form.parentNode.id), window.django_controller);
                 //prevent normal submit to pass button value
                 return false;
             });
@@ -386,22 +391,24 @@ jQuery(function () {
         django_controller = new BaseController();
     }
     jQuery("div[django-ajax-resp-url]").each(function (index) {
-        var url = jQuery(this).attr('django-ajax-resp-url');
+        var html_elem = jQuery(this);
+        var url = html_elem.attr('django-ajax-resp-url');
         if (url == 'self') {
             url = location.href;
         }
-        window.django_controller.init(url, jQuery(this).attr('django-ajax-resp-method'));
+        window.django_controller.init(url, html_elem.attr('django-ajax-resp-method'), html_elem.id);
     });
     jQuery("div[django-ajax-resp-timed-url]").each(function (index) {
-        var url = jQuery(this).attr('django-ajax-resp-timed-url');
+        var html_elem = jQuery(this);
+        var url = html_elem.attr('django-ajax-resp-timed-url');
         //lapse is the time that elapses between two automatic calls in milliseconds, the default value is 1 minute (60000 milliseconds)
-        var lapse = jQuery(this).attr('django-ajax-resp-timed-lapse') || 60000
+        var lapse = html_elem.attr('django-ajax-resp-timed-lapse') || 60000
         if (url == 'self') {
             url = location.href;
         }
         dj_ajax_log("'Django ajax resp framework' initiated the timed autocall to '" + url + "'  every  " + lapse + " milliseconds.");
         setInterval(function () {
-            window.django_controller.init(url, jQuery(this).attr('django-ajax-resp-timed-method'))
+            window.django_controller.init(url, jQuery(this).attr('django-ajax-resp-timed-method'), jQuery(this).id)
         }, lapse);
     });
 
