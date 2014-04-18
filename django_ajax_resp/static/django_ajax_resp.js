@@ -372,7 +372,7 @@ hideLoading = function () {
 
 hidePopup = function () {
     jQuery('#django_ajax_resp_modal_div').modal('hide');
-}
+};
 
 
 function dj_ajax_log(msg) {
