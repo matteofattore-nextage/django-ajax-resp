@@ -406,9 +406,11 @@ jQuery(function () {
         if (url == 'self') {
             url = location.href;
         }
+        method = jQuery(this).attr('django-ajax-resp-timed-method');
+        html_elem_id = html_elem.id;
         dj_ajax_log("'Django ajax resp framework' initiated the timed autocall to '" + url + "'  every  " + lapse + " milliseconds.");
         setInterval(function () {
-            window.django_controller.init(url, jQuery(this).attr('django-ajax-resp-timed-method'), jQuery(this).id)
+            window.django_controller.init(url, method, html_elem_id);
         }, lapse);
     });
 
