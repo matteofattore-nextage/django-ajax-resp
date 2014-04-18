@@ -396,7 +396,7 @@ jQuery(function () {
         if (url == 'self') {
             url = location.href;
         }
-        window.django_controller.init(url, html_elem.attr('django-ajax-resp-method'), html_elem.id);
+        window.django_controller.init(url, html_elem.attr('django-ajax-resp-method'), html_elem.attr("id"));
     });
     jQuery("div[django-ajax-resp-timed-url]").each(function (index) {
         var html_elem = jQuery(this);
@@ -406,8 +406,8 @@ jQuery(function () {
         if (url == 'self') {
             url = location.href;
         }
-        method = jQuery(this).attr('django-ajax-resp-timed-method');
-        html_elem_id = html_elem.id;
+        var method = jQuery(this).attr('django-ajax-resp-timed-method');
+        var html_elem_id = html_elem.attr("id");
         dj_ajax_log("'Django ajax resp framework' initiated the timed autocall to '" + url + "'  every  " + lapse + " milliseconds.");
         setInterval(function () {
             window.django_controller.init(url, method, html_elem_id);
