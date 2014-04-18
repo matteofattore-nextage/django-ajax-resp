@@ -47,9 +47,9 @@ BaseController.prototype.callDjango = function (callType, urlMapping, data, call
     if (data == null || data == undefined) {
         data = []
     }
-    data.push({'django-ajax-resp': true});
+    data.push({name:'django-ajax-resp', value: true});
     if (caller_html_elem_id != undefined) {
-        data.push({'caller_html_elem_id': caller_html_elem_id});
+        data.push({name:'caller_html_elem_id', value: caller_html_elem_id});
 
     }
 
