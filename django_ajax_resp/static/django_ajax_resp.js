@@ -270,7 +270,7 @@ BaseController.prototype.enableForms = function () {
         if (form.attr('django-ajax-resp-enable') === "true") {
             form.find(":submit").on('click', function () {
                 dj_ajax_log("- clicked_button.id: " + this.id);
-                jQuery.proxy(window.django_controller.submitForm(form_id = this.form.id, clicked_button = this, this.form.parentNode.id), window.django_controller);
+                jQuery.proxy(window.django_controller.submitForm(form_id = this.form.id, clicked_button = this,  action = undefined, method = undefined, caller_html_elem_id = this.form.parentNode.id), window.django_controller);
                 //prevent normal submit to pass button value
                 return false;
             });
