@@ -263,6 +263,7 @@ BaseController.prototype.enableForms = function () {
     for (var i = 0; i < forms.length; i++) {
         var form = jQuery(forms[i]);    // A DOM element, not a jQuery object
         if (form.attr('django-ajax-resp-enable') === "true") {
+            form.find(":submit").off('click');
             form.find(":submit").on('click', function () {
                 dj_ajax_log("- clicked_button.id: " + this.id);
                 jQuery.proxy(window.django_controller.submitForm(form_id = this.form.id, clicked_button = this), window.django_controller);
