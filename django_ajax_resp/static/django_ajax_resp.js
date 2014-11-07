@@ -159,6 +159,25 @@ BaseController.prototype.django_action__html__html_append = function (responseIt
     ;
 }
 
+BaseController.prototype.django_action__html__html_prepend = function (responseItem) {
+    if (responseItem["type"] == "html") {
+        if (responseItem["action"] == "html_append") {
+            html_str = responseItem["data"];
+            html_str = html_str.replace(/^.*Content-Type:.*$/mg, "");
+            target_div = jQuery(responseItem["target"]);
+            if (target_div.length > 0) {
+                target_div.prepend(html_str);
+            } else {
+                dj_ajax_log("Target DIV '" + responseItem["target"] + "' doesn't exist.");
+            }
+            ;
+            this.django_action_html_execute_response_js(responseItem);
+        }
+        ;
+    }
+    ;
+}
+
 BaseController.prototype.django_action__html__html_remove = function (responseItem) {
     if (responseItem["type"] == "html") {
         if (responseItem["action"] == "html_remove") {
