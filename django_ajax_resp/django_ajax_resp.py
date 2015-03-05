@@ -8,9 +8,12 @@ from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 
 try:
-    from django.utils import simplejson as json
+    import json
 except:
-    import simplejson as json
+    try:
+        from django.utils import simplejson as json
+    except:
+        import simplejson as json
 
 #__all__ = ['ResponseItem', 'ResponseArray']
 
