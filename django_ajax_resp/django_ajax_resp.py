@@ -6,7 +6,11 @@ Created on Jun 14, 2012
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
-from django.utils import simplejson
+
+try:
+    from django.utils import simplejson as json
+except:
+    import simplejson as json
 
 #__all__ = ['ResponseItem', 'ResponseArray']
 
@@ -67,4 +71,4 @@ class ResponseArray():
         out_array = []
         for resp_item in self.response_array:
             out_array.append(resp_item.get_response_item(request))            
-        return HttpResponse(simplejson.dumps(out_array), mimetype="application/json" )
+        return HttpResponse(json.dumps(out_array), mimetype="application/json" )
