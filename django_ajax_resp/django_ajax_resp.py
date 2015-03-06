@@ -73,5 +73,10 @@ class ResponseArray():
         ''' 
         out_array = []
         for resp_item in self.response_array:
-            out_array.append(resp_item.get_response_item(request))            
-        return HttpResponse(json.dumps(out_array), mimetype="application/json" )
+            out_array.append(resp_item.get_response_item(request))
+        try:
+            response = HttpResponse(json.dumps(out_array), content_type="application/json" )
+        except:
+            response = HttpResponse(json.dumps(out_array), mimetype="application/json" )
+
+        return response
